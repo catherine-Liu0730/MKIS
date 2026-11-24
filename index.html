@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MKIS｜工具首頁</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f3f5f6;
+            color: #20272d;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Microsoft JhengHei",
+                sans-serif;
+            line-height: 1.6;
+        }
+
+        .topbar {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 18px 34px;
+            border-bottom: 1px solid #d8e0e5;
+            background: #fafbfc;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #c7dce7;
+            border-radius: 11px;
+            background: #e6f0f5;
+            color: #446d82;
+            font-size: 23px;
+        }
+
+        .brand {
+            font-size: 27px;
+            font-weight: 800;
+        }
+
+        .brand span {
+            color: #446d82;
+        }
+
+        .brand-sub {
+            margin-left: 10px;
+            padding-left: 20px;
+            border-left: 1px solid #d8e0e5;
+            color: #65737d;
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 64px 34px;
+        }
+
+        .eyebrow {
+            color: #446d82;
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 15px 0 12px;
+            font-size: clamp(32px, 4vw, 46px);
+            line-height: 1.3;
+        }
+
+        h1 span {
+            color: #446d82;
+        }
+
+        .description {
+            margin: 0;
+            color: #65737d;
+            font-size: 14px;
+        }
+
+        .tools {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-top: 38px;
+        }
+
+        .tool-card {
+            display: block;
+            padding: 28px;
+            border: 1px solid #d8e0e5;
+            border-radius: 15px;
+            background: #ffffff;
+            color: #20272d;
+            text-decoration: none;
+            transition:
+                background 0.2s,
+                border-color 0.2s,
+                transform 0.2s;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            border-color: #acc8d8;
+            background: #fbfdfe;
+        }
+
+        .tool-card:focus-visible {
+            outline: 2px solid #446d82;
+            outline-offset: 4px;
+        }
+
+        .number {
+            display: grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border: 1px solid #cbdde7;
+            border-radius: 7px;
+            background: #e8f1f6;
+            color: #446d82;
+            font-family: monospace;
+        }
+
+        h2 {
+            margin: 22px 0 9px;
+            font-size: 23px;
+        }
+
+        .tool-card p {
+            margin: 0;
+            color: #65737d;
+            font-size: 14px;
+        }
+
+        .open-tool {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 9px 15px;
+            border: 1px solid #abcbdc;
+            border-radius: 7px;
+            background: #c1dce9;
+            color: #203a49;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 20px;
+            border-top: 1px solid #d8e0e5;
+            color: #6c7d88;
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 700px) {
+            .tools {
+                grid-template-columns: 1fr;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            .topbar {
+                padding: 16px 22px;
+            }
+
+            main {
+                padding: 40px 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="topbar">
+        <span class="brand-icon" aria-hidden="true">▦</span>
+        <span class="brand">MKIS<span>.</span></span>
+        <span class="brand-sub">PERSONAL TOOL WORKSPACE</span>
+    </header>
+
+    <main>
+        <div class="eyebrow">TOOL WORKSPACE / HOME</div>
+
+        <h1>我的<span>工具工作台。</span></h1>
+
+        <p class="description">
+            選擇需要的工具，開始處理資料。
+        </p>
+
+        <div class="tools">
+            <a class="tool-card" href="excel-compare.html">
+                <span class="number">01</span>
+
+                <h2>姓名與身分證驗證</h2>
+
+                <p>
+                    匯入正確名單與待驗證 Excel，
+                    找出姓名、身分證不一致的資料。
+                </p>
+
+                <span class="open-tool">開啟工具 →</span>
+            </a>
+        </div>
+
+        <footer class="footer">
+            MKIS / PERSONAL TOOL WORKSPACE
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,1939 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MKIS｜姓名與身分證驗證</title>
+
+    <style>
+        :root {
+            color-scheme: light;
+            --background: #f3f5f6;
+            --panel: #ffffff;
+            --border: #d8e0e5;
+            --text: #20272d;
+            --muted: #65737d;
+            --blue: #446d82;
+            --button: #dfeef5;
+            --primary: #c1dce9;
+            --error: #a04444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: var(--text);
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Microsoft JhengHei",
+                sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button,
+        summary {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+
+        a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        a:focus-visible,
+        summary:focus-visible {
+            outline: 2px solid var(--blue);
+            outline-offset: 4px;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        /* 頂部導覽 */
+        .topbar {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px 34px;
+            border-bottom: 1px solid var(--border);
+            background: #fafbfc;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            color: var(--text);
+            font-size: 27px;
+            font-weight: 800;
+        }
+
+        .brand:hover {
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border: 1px solid #c7dce7;
+            border-radius: 11px;
+            background: #e6f0f5;
+            color: var(--blue);
+            font-size: 23px;
+        }
+
+        .brand-dot {
+            color: var(--blue);
+        }
+
+        .brand-sub {
+            margin-left: 10px;
+            padding-left: 20px;
+            border-left: 1px solid var(--border);
+            color: var(--muted);
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .home-link {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 11px;
+            border: 1px solid #cbdfe8;
+            border-radius: 6px;
+            background: #edf4f7;
+            color: var(--blue);
+            font-family: monospace;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #88afc2;
+            box-shadow: 0 0 0 4px #88afc218;
+        }
+
+        /* 主標題 */
+        main {
+            max-width: 1550px;
+            margin: 0 auto;
+            padding: 44px 34px 28px;
+        }
+
+        .hero {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 28px;
+            margin-bottom: 32px;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--blue);
+            font-family: monospace;
+            font-size: 11px;
+            letter-spacing: 2px;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 25px;
+            height: 1px;
+            background: #89b2c7;
+        }
+
+        h1 {
+            margin: 15px 0 10px;
+            font-size: clamp(29px, 3.3vw, 46px);
+            line-height: 1.3;
+            letter-spacing: -1px;
+        }
+
+        h1 span {
+            color: var(--blue);
+        }
+
+        .hero-description {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .metrics {
+            display: flex;
+            flex-shrink: 0;
+        }
+
+        .metric {
+            padding: 0 22px;
+            border-left: 1px solid var(--border);
+        }
+
+        .metric:first-child {
+            border-left: 0;
+        }
+
+        .metric strong {
+            display: block;
+            font-family: monospace;
+            font-size: 31px;
+            font-weight: normal;
+            line-height: 1.3;
+        }
+
+        .metric small {
+            color: var(--muted);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* 左右面板 */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: var(--panel);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafb;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .panel-number {
+            width: 33px;
+            height: 33px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border: 1px solid #cbdde7;
+            border-radius: 6px;
+            background: #e8f1f6;
+            color: var(--blue);
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .subtitle {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-family: monospace;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+        }
+
+        .panel-tag {
+            color: var(--muted);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .panel-content {
+            padding: 24px;
+        }
+
+        .panel-footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px 24px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .section-caption {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        /* 選檔與欄位 */
+        .file-zone {
+            padding: 20px;
+            border: 1px dashed #c5d5de;
+            border-radius: 10px;
+            background: #f8fafb;
+        }
+
+        .file-zone > label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .file-zone p {
+            margin: 9px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .file-input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .file-input::file-selector-button {
+            margin-right: 10px;
+            padding: 8px 12px;
+            border: 1px solid #c4d8e3;
+            border-radius: 6px;
+            background: #e4eef4;
+            color: #263d49;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .reader-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 13px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 15px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 0;
+        }
+
+        .field label {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            min-width: 0;
+            min-height: 41px;
+            padding: 9px 11px;
+            border: 1px solid #cdd9e0;
+            border-radius: 6px;
+            background: #f9fbfc;
+            color: var(--text);
+        }
+
+        input::placeholder {
+            color: #83919b;
+        }
+
+        .sheet-field {
+            margin-top: 16px;
+        }
+
+        .header-config {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: end;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        /* 按鈕 */
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 1px solid #bfd4e0;
+            border-radius: 7px;
+            background: var(--button);
+            color: #263d49;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+
+        .button:hover {
+            background: #d2e4ee;
+        }
+
+        .button-primary {
+            border-color: #abcbdc;
+            background: var(--primary);
+            color: #203a49;
+        }
+
+        .button-primary:hover {
+            background: #b2d2e3;
+        }
+
+        .button-wide {
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .manual-button {
+            margin-top: 12px;
+        }
+
+        /* 提示與摺疊區 */
+        .status {
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .status:empty {
+            display: none;
+        }
+
+        .status[data-tone="success"] {
+            color: #38677c;
+        }
+
+        .status[data-tone="error"] {
+            color: var(--error);
+        }
+
+        .helper {
+            margin: 11px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        details {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        summary {
+            color: #263640;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        details[open] summary {
+            margin-bottom: 13px;
+        }
+
+        .storage-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .storage-row .file-input {
+            flex: 1;
+        }
+
+        .storage-row .button {
+            flex-shrink: 0;
+        }
+
+        .action-box {
+            margin-top: 24px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background:
+                radial-gradient(circle, #d8e4eb 1px, transparent 1px)
+                0 0 / 22px 22px,
+                #f8fafb;
+            text-align: center;
+        }
+
+        .action-box strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .action-box p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 14px 16px;
+            border: 1px solid #d2e1e9;
+            border-radius: 8px;
+            background: #eff5f8;
+            color: #536874;
+            font-size: 12px;
+        }
+
+        .notice strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #385f74;
+        }
+
+        /* 差異結果 */
+        .results {
+            margin-top: 22px;
+        }
+
+        .result-summary {
+            padding: 0 24px;
+        }
+
+        .table-wrap {
+            max-height: 500px;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: #f1f5f7;
+        }
+
+        th,
+        td {
+            padding: 13px 20px;
+            border-bottom: 1px solid #e0e7ec;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+
+        td {
+            min-width: 100px;
+            overflow-wrap: anywhere;
+        }
+
+        tbody tr:hover {
+            background: #f6fafc;
+        }
+
+        .difference-cell {
+            background: #fbf0df;
+            color: #7b5526;
+            font-weight: 600;
+        }
+
+        .result-issue {
+            color: #9b4747;
+            font-weight: 600;
+        }
+
+        .result-note {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .empty {
+            padding: 35px 24px;
+            color: var(--muted);
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 23px;
+            color: #6c7d88;
+            font-family: monospace;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 900px) {
+            .brand-sub {
+                display: none;
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 24px;
+            }
+
+            .metrics {
+                width: 100%;
+            }
+
+            .metric {
+                flex: 1;
+            }
+
+            .metric:first-child {
+                padding-left: 0;
+            }
+
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .topbar {
+                padding: 15px;
+            }
+
+            .brand {
+                font-size: 23px;
+            }
+
+            .home-link {
+                display: none;
+            }
+
+            .badge {
+                font-size: 9px;
+            }
+
+            main {
+                padding: 28px 14px;
+            }
+
+            .panel-header,
+            .panel-content {
+                padding: 18px;
+            }
+
+            .metric {
+                padding: 0 12px;
+            }
+
+            .metric strong {
+                font-size: 26px;
+            }
+
+            .metric small {
+                font-size: 10px;
+            }
+
+            .fields,
+            .header-config {
+                grid-template-columns: 1fr;
+            }
+
+            .header-config .button {
+                justify-self: start;
+            }
+
+            .storage-row {
+                flex-wrap: wrap;
+            }
+
+            .storage-row .file-input {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="topbar">
+        <a class="brand" href="index.html">
+            <span class="brand-icon" aria-hidden="true">▦</span>
+            <span>MKIS<span class="brand-dot">.</span></span>
+            <span class="brand-sub">DATA VERIFICATION STUDIO</span>
+        </a>
+
+        <div class="top-actions">
+            <span class="badge">
+                <span class="status-dot"></span>
+                LOCAL PROCESSING
+            </span>
+
+            <a class="home-link" href="index.html">← 回工具首頁</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div>
+                <div class="eyebrow">DATA WORKSPACE / 01</div>
+
+                <h1>名單資料<span>驗證工作台。</span></h1>
+
+                <p class="hero-description">
+                    以正確名單為基準，找出姓名與身分證的差異。
+                </p>
+            </div>
+
+            <div class="metrics">
+                <div class="metric">
+                    <strong id="personCount">0</strong>
+                    <small>正確名單筆數</small>
+                </div>
+
+                <div class="metric">
+                    <strong id="checkCount">0</strong>
+                    <small>待驗證資料筆數</small>
+                </div>
+
+                <div class="metric">
+                    <strong id="differenceMetric">—</strong>
+                    <small>差異／需確認筆數</small>
+                </div>
+            </div>
+        </section>
+
+        <div class="workspace">
+            <!-- 01：正確名單 -->
+            <section class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-number">01</span>
+
+                        <div>
+                            <h2>正確名單</h2>
+                            <span class="subtitle">REFERENCE DATA</span>
+                        </div>
+                    </div>
+
+                    <span class="panel-tag" id="baseCountLabel">
+                        尚未建立
+                    </span>
+                </div>
+
+                <div class="panel-content">
+                    <div class="section-caption">
+                        <span>從 Excel 建立基準名單</span>
+                        <span>.xlsx / .xls</span>
+                    </div>
+
+                    <div id="baseExcelPanel"></div>
+
+                    <button
+                        class="button button-primary button-wide"
+                        type="button"
+                        id="useBaseButton"
+                    >
+                        ＋ 設為正確名單
+                    </button>
+
+                    <p class="helper">
+                        成功後會取代目前名單；請先匯出要保留的資料。
+                    </p>
+
+                    <details>
+                        <summary>手動新增一筆資料</summary>
+
+                        <form id="personForm">
+                            <div class="fields">
+                                <div class="field">
+                                    <label for="personName">姓名</label>
+                                    <input
+                                        type="text"
+                                        id="personName"
+                                        placeholder="輸入正確姓名"
+                                        required
+                                    >
+                                </div>
+
+                                <div class="field">
+                                    <label for="personId">身分證字號</label>
+                                    <input
+                                        type="text"
+                                        id="personId"
+                                        placeholder="輸入正確身分證字號"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <button
+                                class="button manual-button"
+                                type="submit"
+                            >
+                                ＋ 新增至名單
+                            </button>
+                        </form>
+                    </details>
+
+                    <details>
+                        <summary>保存與還原名單 · JSON</summary>
+
+                        <button
+                            class="button"
+                            type="button"
+                            id="exportButton"
+                        >
+                            ↓ 匯出正確名單
+                        </button>
+
+                        <div class="storage-row">
+                            <input
+                                class="file-input"
+                                type="file"
+                                id="importFile"
+                                accept=".json"
+                                aria-label="選擇正確名單 JSON"
+                            >
+
+                            <button
+                                class="button"
+                                type="button"
+                                id="importButton"
+                            >
+                                匯入 JSON
+                            </button>
+                        </div>
+
+                        <p class="helper">
+                            匯入會取代目前名單。
+                            關閉或重新整理前，請匯出最新資料。
+                        </p>
+                    </details>
+
+                    <p class="status" id="message" role="status"></p>
+                </div>
+
+                <div class="panel-footer">
+                    <span>Excel / 手動輸入 / JSON</span>
+                    <span>REFERENCE SOURCE</span>
+                </div>
+            </section>
+
+            <!-- 02：待驗證資料 -->
+            <section class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <span class="panel-number">02</span>
+
+                        <div>
+                            <h2>待驗證資料</h2>
+                            <span class="subtitle">VERIFICATION SOURCE</span>
+                        </div>
+                    </div>
+
+                    <span class="panel-tag">指定欄位後開始驗證</span>
+                </div>
+
+                <div class="panel-content">
+                    <div class="section-caption">
+                        <span>讀取需要檢查的 Excel</span>
+                        <span>.xlsx / .xls</span>
+                    </div>
+
+                    <div id="checkExcelPanel"></div>
+
+                    <div class="action-box">
+                        <strong>資料準備完成後，即可開始驗證</strong>
+
+                        <p>
+                            依左側已建立的正確名單檢查，
+                            不需要先將兩份 Excel 排序。
+                        </p>
+
+                        <button
+                            class="button button-primary button-wide"
+                            type="button"
+                            id="verifyButton"
+                        >
+                            開始驗證
+                        </button>
+                    </div>
+
+                    <div class="notice">
+                        <strong>只顯示差異與需確認資料</strong>
+                        相同資料不列出。淡黃色標示不同或缺漏的欄位；
+                        同名多人、重複身分證等情況會提示人工確認。
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    <span>檔案在此瀏覽器內處理</span>
+                    <span>LOCAL PROCESSING</span>
+                </div>
+            </section>
+        </div>
+
+        <!-- 03：只顯示差異 -->
+        <section class="panel results" id="differencePanel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="panel-number">03</span>
+
+                    <div>
+                        <h2>差異結果</h2>
+                        <span class="subtitle">DIFFERENCES ONLY</span>
+                    </div>
+                </div>
+
+                <span class="badge" id="differenceCount">
+                    尚未驗證
+                </span>
+            </div>
+
+            <div class="result-summary">
+                <p
+                    class="status"
+                    id="verifyMessage"
+                    role="status"
+                ></p>
+            </div>
+
+            <div class="empty" id="differenceEmpty">
+                尚未驗證。請先建立正確名單，並讀取待驗證 Excel。
+            </div>
+
+            <div class="table-wrap" id="differenceTable" hidden>
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Excel 列號</th>
+                            <th scope="col">待驗證姓名</th>
+                            <th scope="col">待驗證身分證</th>
+                            <th scope="col">差異說明</th>
+                            <th scope="col">基準資料／確認提示</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="differenceRows"></tbody>
+                </table>
+            </div>
+
+            <div class="panel-footer">
+                <span>只檢查待驗證檔案內的資料，不檢查缺席名單。</span>
+                <span>尚未檢查身分證格式與檢查碼</span>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <span>MKIS / DATA VERIFICATION STUDIO</span>
+            <span>瀏覽器本機處理 · 無需登入</span>
+        </footer>
+    </main>
+
+    <!-- 這個檔案必須與 HTML 放在同一個資料夾 -->
+    <script src="xlsx.full.min.js"></script>
+
+    <script>
+        "use strict";
+
+        // ===== 共用工具 =====
+
+        function getElement(id) {
+            return document.getElementById(id);
+        }
+
+        function showMessage(element, text, tone = "") {
+            element.textContent = text;
+            element.dataset.tone = tone;
+        }
+
+        const correctList = [];
+        const message = getElement("message");
+        const verifyMessage = getElement("verifyMessage");
+
+        // ===== 清除舊驗證結果 =====
+
+        function invalidateResults() {
+            getElement("differenceRows").replaceChildren();
+            getElement("differenceTable").hidden = true;
+            getElement("differenceEmpty").hidden = false;
+
+            getElement("differenceEmpty").textContent =
+                "請確認資料與欄位設定，再按「開始驗證」。";
+
+            getElement("differenceCount").textContent = "尚未驗證";
+            getElement("differenceMetric").textContent = "—";
+
+            showMessage(verifyMessage, "");
+        }
+
+        function updateReferenceCount() {
+            getElement("personCount").textContent =
+                correctList.length;
+
+            getElement("baseCountLabel").textContent =
+                correctList.length > 0
+                    ? "已建立 " + correctList.length + " 筆"
+                    : "尚未建立";
+
+            invalidateResults();
+        }
+
+        // ===== 檢查正確名單 =====
+
+        function validateList(data) {
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error("名單沒有資料，或格式不正確。");
+            }
+
+            const result = [];
+            const usedIds = new Set();
+
+            for (const person of data) {
+                if (
+                    !person ||
+                    typeof person.name !== "string" ||
+                    typeof person.id !== "string"
+                ) {
+                    throw new Error(
+                        "每筆資料都必須包含文字格式的姓名和身分證。"
+                    );
+                }
+
+                const name = person.name.trim();
+                const id = person.id.trim().toUpperCase();
+
+                const position = person.row
+                    ? "Excel 第 " + person.row + " 列"
+                    : "第 " + (result.length + 1) + " 筆";
+
+                if (!name || !id) {
+                    throw new Error(
+                        position + " 的姓名或身分證空白。"
+                    );
+                }
+
+                if (usedIds.has(id)) {
+                    throw new Error(
+                        position + " 的身分證重複，請先確認。"
+                    );
+                }
+
+                usedIds.add(id);
+                result.push({ name: name, id: id });
+            }
+
+            return result;
+        }
+
+        function replaceList(data) {
+            correctList.length = 0;
+
+            for (const person of data) {
+                correctList.push(person);
+            }
+
+            updateReferenceCount();
+        }
+
+        // ===== 手動新增 =====
+
+        getElement("personForm").addEventListener(
+            "submit",
+            function (event) {
+                event.preventDefault();
+
+                const nameInput = getElement("personName");
+                const idInput = getElement("personId");
+
+                const name = nameInput.value.trim();
+                const id = idInput.value.trim().toUpperCase();
+
+                if (!name || !id) {
+                    showMessage(
+                        message,
+                        "姓名和身分證都要填寫。",
+                        "error"
+                    );
+                    return;
+                }
+
+                const exists = correctList.some(function (person) {
+                    return person.id === id;
+                });
+
+                if (exists) {
+                    showMessage(
+                        message,
+                        "這個身分證已在名單中，請確認。",
+                        "error"
+                    );
+                    return;
+                }
+
+                correctList.push({ name: name, id: id });
+                updateReferenceCount();
+
+                showMessage(
+                    message,
+                    "新增成功，目前共 " + correctList.length + " 筆。",
+                    "success"
+                );
+
+                getElement("personForm").reset();
+                nameInput.focus();
+            }
+        );
+
+        // ===== JSON 匯出 =====
+
+        getElement("exportButton").addEventListener(
+            "click",
+            function () {
+                if (correctList.length === 0) {
+                    showMessage(
+                        message,
+                        "目前沒有名單可以匯出。",
+                        "error"
+                    );
+                    return;
+                }
+
+                const file = new Blob(
+                    [JSON.stringify(correctList, null, 2)],
+                    { type: "application/json" }
+                );
+
+                const url = URL.createObjectURL(file);
+                const link = document.createElement("a");
+
+                link.href = url;
+                link.download = "正確名單.json";
+
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                setTimeout(function () {
+                    URL.revokeObjectURL(url);
+                }, 1000);
+
+                showMessage(
+                    message,
+                    "已啟動下載，請確認下載資料夾。",
+                    "success"
+                );
+            }
+        );
+
+        // ===== JSON 匯入 =====
+
+        getElement("importButton").addEventListener(
+            "click",
+            async function () {
+                const file = getElement("importFile").files[0];
+
+                if (!file) {
+                    showMessage(
+                        message,
+                        "請先選擇 JSON 檔。",
+                        "error"
+                    );
+                    return;
+                }
+
+                getElement("importButton").disabled = true;
+
+                try {
+                    const text = await file.text();
+                    const data = validateList(JSON.parse(text));
+
+                    replaceList(data);
+
+                    showMessage(
+                        message,
+                        "JSON 匯入成功，共 " +
+                            correctList.length + " 筆。",
+                        "success"
+                    );
+                } catch (error) {
+                    showMessage(
+                        message,
+                        "匯入失敗，原名單保留：" + error.message,
+                        "error"
+                    );
+                } finally {
+                    getElement("importButton").disabled = false;
+                }
+            }
+        );
+
+        // ===== 建立 Excel 讀取區 =====
+        // 左右面板共用介面與讀取邏輯，但資料各自獨立。
+
+        function createExcelReader(panelId, prefix) {
+            const panel = getElement(panelId);
+
+            panel.innerHTML = `
+                <div class="file-zone">
+                    <label for="${prefix}File">
+                        選擇 Excel 檔案
+                    </label>
+
+                    <input
+                        class="file-input"
+                        type="file"
+                        id="${prefix}File"
+                        accept=".xlsx,.xls"
+                    >
+
+                    <p>
+                        支援 .xlsx 與 .xls。
+                        選檔後，按下方按鈕讀取。
+                    </p>
+                </div>
+
+                <div class="reader-actions">
+                    <button
+                        class="button"
+                        type="button"
+                        id="${prefix}Read"
+                    >
+                        ↑ 讀取 Excel
+                    </button>
+                </div>
+
+                <p
+                    class="status"
+                    id="${prefix}Message"
+                    role="status"
+                ></p>
+
+                <div id="${prefix}Settings" hidden>
+                    <div class="field sheet-field">
+                        <label for="${prefix}Sheet">
+                            工作表 / WORKSHEET
+                        </label>
+
+                        <select id="${prefix}Sheet"></select>
+                    </div>
+
+                    <div class="header-config">
+                        <div class="field">
+                            <label for="${prefix}Header">
+                                欄位標題在第幾列
+                            </label>
+
+                            <input
+                                type="number"
+                                id="${prefix}Header"
+                                min="1"
+                                value="1"
+                            >
+                        </div>
+
+                        <button
+                            class="button"
+                            type="button"
+                            id="${prefix}Columns"
+                        >
+                            載入欄位
+                        </button>
+                    </div>
+
+                    <div class="fields">
+                        <div class="field">
+                            <label for="${prefix}Name">
+                                姓名欄
+                            </label>
+
+                            <select id="${prefix}Name"></select>
+                        </div>
+
+                        <div class="field">
+                            <label for="${prefix}Id">
+                                身分證字號欄
+                            </label>
+
+                            <select id="${prefix}Id"></select>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const fileInput = getElement(prefix + "File");
+            const readButton = getElement(prefix + "Read");
+            const status = getElement(prefix + "Message");
+            const settings = getElement(prefix + "Settings");
+            const sheetSelect = getElement(prefix + "Sheet");
+            const headerInput = getElement(prefix + "Header");
+            const nameSelect = getElement(prefix + "Name");
+            const idSelect = getElement(prefix + "Id");
+            const columnsButton = getElement(prefix + "Columns");
+
+            let workbook = null;
+            let rows = [];
+            let loadedHeader = null;
+
+            function updateTargetCount() {
+                if (prefix !== "check") {
+                    return;
+                }
+
+                let count = 0;
+
+                if (loadedHeader !== null) {
+                    for (let i = loadedHeader; i < rows.length; i++) {
+                        const row = rows[i] || [];
+
+                        if (row.some(function (value) {
+                            return String(value).trim() !== "";
+                        })) {
+                            count++;
+                        }
+                    }
+                }
+
+                getElement("checkCount").textContent = count;
+            }
+
+            function notifyChanged() {
+                if (prefix === "check") {
+                    invalidateResults();
+                }
+            }
+
+            function clearColumns() {
+                rows = [];
+                loadedHeader = null;
+
+                nameSelect.replaceChildren();
+                idSelect.replaceChildren();
+
+                updateTargetCount();
+                notifyChanged();
+            }
+
+            function reset() {
+                workbook = null;
+                clearColumns();
+                sheetSelect.replaceChildren();
+                settings.hidden = true;
+            }
+
+            function loadColumns() {
+                clearColumns();
+
+                if (!workbook) {
+                    return;
+                }
+
+                const header = Number(headerInput.value);
+
+                if (!Number.isInteger(header) || header < 1) {
+                    showMessage(
+                        status,
+                        "標題列請填入大於 0 的整數。",
+                        "error"
+                    );
+                    return;
+                }
+
+                try {
+                    const sheet = workbook.Sheets[sheetSelect.value];
+
+                    const data = XLSX.utils.sheet_to_json(sheet, {
+                        header: 1,
+                        range: 0,
+                        defval: "",
+                        raw: false,
+                        blankrows: true
+                    });
+
+                    const titles = data[header - 1];
+
+                    if (
+                        !titles ||
+                        !titles.some(function (value) {
+                            return String(value).trim() !== "";
+                        })
+                    ) {
+                        throw new Error(
+                            "這一列沒有標題，請確認列號。"
+                        );
+                    }
+
+                    rows = data;
+                    loadedHeader = header;
+
+                    nameSelect.add(
+                        new Option("請選擇姓名欄", "")
+                    );
+
+                    idSelect.add(
+                        new Option("請選擇身分證欄", "")
+                    );
+
+                    titles.forEach(function (title, index) {
+                        const label =
+                            XLSX.utils.encode_col(index) +
+                            " 欄：" +
+                            (String(title).trim() || "未命名");
+
+                        nameSelect.add(
+                            new Option(label, String(index))
+                        );
+
+                        idSelect.add(
+                            new Option(label, String(index))
+                        );
+                    });
+
+                    updateTargetCount();
+
+                    showMessage(
+                        status,
+                        "讀取成功，請指定姓名和身分證欄。",
+                        "success"
+                    );
+                } catch (error) {
+                    clearColumns();
+
+                    showMessage(
+                        status,
+                        "載入欄位失敗：" + error.message,
+                        "error"
+                    );
+                }
+            }
+
+            fileInput.addEventListener("change", function () {
+                reset();
+
+                showMessage(
+                    status,
+                    "已選檔，請按「讀取 Excel」。"
+                );
+            });
+
+            headerInput.addEventListener("input", function () {
+                clearColumns();
+
+                showMessage(
+                    status,
+                    "標題列已修改，請按「載入欄位」。"
+                );
+            });
+
+            sheetSelect.addEventListener("change", loadColumns);
+            columnsButton.addEventListener("click", loadColumns);
+
+            [nameSelect, idSelect].forEach(function (select) {
+                select.addEventListener("change", function () {
+                    notifyChanged();
+
+                    if (
+                        nameSelect.value === "" ||
+                        idSelect.value === ""
+                    ) {
+                        showMessage(
+                            status,
+                            "請完成姓名與身分證欄位設定。"
+                        );
+                        return;
+                    }
+
+                    if (nameSelect.value === idSelect.value) {
+                        showMessage(
+                            status,
+                            "姓名與身分證不能選擇同一欄。",
+                            "error"
+                        );
+                        return;
+                    }
+
+                    showMessage(
+                        status,
+                        "姓名與身分證欄位已設定。",
+                        "success"
+                    );
+                });
+            });
+
+            readButton.addEventListener(
+                "click",
+                async function () {
+                    const file = fileInput.files[0];
+
+                    if (!file) {
+                        showMessage(
+                            status,
+                            "請先選擇 Excel 檔。",
+                            "error"
+                        );
+                        return;
+                    }
+
+                    if (typeof XLSX === "undefined") {
+                        showMessage(
+                            status,
+                            "找不到 Excel 工具，請將 " +
+                            "xlsx.full.min.js 與 HTML " +
+                            "放在同一個資料夾。",
+                            "error"
+                        );
+                        return;
+                    }
+
+                    reset();
+
+                    readButton.disabled = true;
+                    fileInput.disabled = true;
+
+                    showMessage(status, "讀取中……");
+
+                    try {
+                        const buffer = await file.arrayBuffer();
+                        workbook = XLSX.read(buffer);
+
+                        if (workbook.SheetNames.length === 0) {
+                            throw new Error("檔案沒有工作表。");
+                        }
+
+                        workbook.SheetNames.forEach(function (name) {
+                            sheetSelect.add(new Option(name, name));
+                        });
+
+                        settings.hidden = false;
+                        loadColumns();
+                    } catch (error) {
+                        reset();
+
+                        showMessage(
+                            status,
+                            "讀取失敗，請確認 Excel " +
+                            "可正常開啟，且未加密。",
+                            "error"
+                        );
+                    } finally {
+                        readButton.disabled = false;
+                        fileInput.disabled = false;
+                    }
+                }
+            );
+
+            function getRecords() {
+                if (!workbook || loadedHeader === null) {
+                    throw new Error(
+                        "請先讀取 Excel 並載入正確的標題列。"
+                    );
+                }
+
+                if (
+                    nameSelect.value === "" ||
+                    idSelect.value === ""
+                ) {
+                    throw new Error(
+                        "請選擇姓名欄與身分證欄。"
+                    );
+                }
+
+                if (nameSelect.value === idSelect.value) {
+                    throw new Error(
+                        "姓名與身分證不能選擇同一欄。"
+                    );
+                }
+
+                const nameIndex = Number(nameSelect.value);
+                const idIndex = Number(idSelect.value);
+                const records = [];
+
+                for (let i = loadedHeader; i < rows.length; i++) {
+                    const row = rows[i] || [];
+
+                    const isEmpty = row.every(function (value) {
+                        return String(value).trim() === "";
+                    });
+
+                    if (isEmpty) {
+                        continue;
+                    }
+
+                    records.push({
+                        row: i + 1,
+                        name: String(row[nameIndex] ?? "").trim(),
+                        id: String(row[idIndex] ?? "")
+                            .trim()
+                            .toUpperCase()
+                    });
+                }
+
+                return records;
+            }
+
+            return {
+                getRecords: getRecords
+            };
+        }
+
+        const baseExcel = createExcelReader(
+            "baseExcelPanel",
+            "base"
+        );
+
+        const checkExcel = createExcelReader(
+            "checkExcelPanel",
+            "check"
+        );
+
+        // ===== Excel 正確名單匯入 =====
+
+        getElement("useBaseButton").addEventListener(
+            "click",
+            function () {
+                try {
+                    const records = baseExcel.getRecords();
+                    const data = validateList(records);
+
+                    replaceList(data);
+
+                    showMessage(
+                        message,
+                        "Excel 正確名單匯入成功，共 " +
+                        correctList.length + " 筆。",
+                        "success"
+                    );
+                } catch (error) {
+                    showMessage(
+                        message,
+                        "匯入失敗，原名單保留：" + error.message,
+                        "error"
+                    );
+                }
+            }
+        );
+
+        // ===== 建立查詢索引 =====
+
+        function createReferenceIndexes() {
+            const byId = new Map();
+            const byName = new Map();
+
+            for (const person of correctList) {
+                byId.set(person.id, person);
+
+                if (!byName.has(person.name)) {
+                    byName.set(person.name, []);
+                }
+
+                byName.get(person.name).push(person);
+            }
+
+            return {
+                byId: byId,
+                byName: byName
+            };
+        }
+
+        // ===== 比對一筆資料 =====
+
+        function compareRecord(record, idCounts, indexes) {
+            const result = {
+                row: record.row,
+                name: record.name,
+                id: record.id,
+                issues: [],
+                reference: "",
+                markName: false,
+                markId: false
+            };
+
+            // 先標記待驗證檔案中的重複身分證。
+            if (
+                record.id &&
+                idCounts.get(record.id) > 1
+            ) {
+                result.issues.push("待驗證檔案內身分證重複");
+                result.markId = true;
+            }
+
+            // 欄位缺漏時，不以空白值搜尋。
+            if (!record.name || !record.id) {
+                result.issues.push("姓名或身分證空白");
+
+                result.markName = !record.name;
+                result.markId =
+                    result.markId || !record.id;
+
+                result.reference =
+                    "請先補齊資料，再重新驗證。";
+
+                return result;
+            }
+
+            // 優先依身分證尋找基準資料。
+            const sameId = indexes.byId.get(record.id);
+
+            if (sameId) {
+                if (sameId.name !== record.name) {
+                    result.issues.push("姓名不符");
+                    result.markName = true;
+                }
+
+                result.reference =
+                    sameId.name + "／" + sameId.id;
+
+                return result.issues.length > 0
+                    ? result
+                    : null;
+            }
+
+            // 身分證找不到時，姓名只作為候選線索。
+            const sameName =
+                indexes.byName.get(record.name) || [];
+
+            if (sameName.length === 1) {
+                result.issues.push(
+                    "疑似身分證不符，需確認"
+                );
+
+                result.markId = true;
+
+                result.reference =
+                    sameName[0].name + "／" +
+                    sameName[0].id +
+                    "（僅依姓名找到候選，請確認是否同一人）";
+
+            } else if (sameName.length > 1) {
+                result.issues.push(
+                    "姓名對應多人，需人工確認"
+                );
+
+                result.markId = true;
+
+                result.reference =
+                    "正確名單中有 " +
+                    sameName.length +
+                    " 位同名者，無法自動判定。";
+
+            } else {
+                result.issues.push("不在正確名單內");
+
+                result.markName = true;
+                result.markId = true;
+
+                result.reference =
+                    "找不到相同姓名或身分證的基準資料。";
+            }
+
+            return result;
+        }
+
+        // ===== 顯示差異結果 =====
+
+        function renderDifferences(results) {
+            const container = getElement("differenceRows");
+            container.replaceChildren();
+
+            for (const result of results) {
+                const row = document.createElement("tr");
+
+                const values = [
+                    result.row,
+                    result.name || "（空白）",
+                    result.id || "（空白）",
+                    result.issues.join("；"),
+                    result.reference
+                ];
+
+                values.forEach(function (value, index) {
+                    const cell = document.createElement("td");
+                    cell.textContent = value;
+
+                    if (
+                        (index === 1 && result.markName) ||
+                        (index === 2 && result.markId)
+                    ) {
+                        cell.classList.add("difference-cell");
+                    }
+
+                    if (index === 3) {
+                        cell.classList.add("result-issue");
+                    }
+
+                    if (index === 4) {
+                        cell.classList.add("result-note");
+                    }
+
+                    row.appendChild(cell);
+                });
+
+                container.appendChild(row);
+            }
+        }
+
+        // ===== 開始驗證 =====
+
+        getElement("verifyButton").addEventListener(
+            "click",
+            function () {
+                invalidateResults();
+
+                try {
+                    if (correctList.length === 0) {
+                        throw new Error(
+                            "請先在左側建立或匯入正確名單。"
+                        );
+                    }
+
+                    const records = checkExcel.getRecords();
+
+                    if (records.length === 0) {
+                        throw new Error(
+                            "待驗證工作表中沒有資料。"
+                        );
+                    }
+
+                    const indexes = createReferenceIndexes();
+                    const idCounts = new Map();
+
+                    for (const record of records) {
+                        if (record.id) {
+                            idCounts.set(
+                                record.id,
+                                (idCounts.get(record.id) || 0) + 1
+                            );
+                        }
+                    }
+
+                    const differences = [];
+
+                    for (const record of records) {
+                        const result = compareRecord(
+                            record,
+                            idCounts,
+                            indexes
+                        );
+
+                        if (result !== null) {
+                            differences.push(result);
+                        }
+                    }
+
+                    renderDifferences(differences);
+
+                    const sameCount =
+                        records.length - differences.length;
+
+                    getElement("differenceCount").textContent =
+                        differences.length + " 筆需確認";
+
+                    getElement("differenceMetric").textContent =
+                        differences.length;
+
+                    getElement("differenceTable").hidden =
+                        differences.length === 0;
+
+                    getElement("differenceEmpty").hidden =
+                        differences.length > 0;
+
+                    getElement("differenceEmpty").textContent =
+                        "驗證完成，本次資料全部與正確名單一致。";
+
+                    showMessage(
+                        verifyMessage,
+                        "共檢查 " + records.length + " 筆；" +
+                        "一致 " + sameCount + " 筆；" +
+                        "差異或需確認 " +
+                        differences.length + " 筆。",
+                        "success"
+                    );
+
+                } catch (error) {
+                    getElement("differenceEmpty").textContent =
+                        "尚未完成驗證，請依上方提示確認資料。";
+
+                    showMessage(
+                        verifyMessage,
+                        error.message,
+                        "error"
+                    );
+                }
+            }
+        );
+    </script>
+</body>
+</html>
